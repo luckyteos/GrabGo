@@ -192,7 +192,7 @@
 						var newDiv = document.createElement('input');
 						newDiv.type = "button";
 						newDiv.style.border = "none";
-						newDiv.onclick = function(){queryBranch()};
+						newDiv.setAttribute("onclick", "queryBranch(this)");
 						newDiv.className = "branchList";
 						newDiv.style.textAlign = "left";
 						newDiv.value = response[i].BranchAdd;
@@ -272,9 +272,22 @@
 
 		function queryBranch(branchDiv){
 			console.log("Query Branch code here");
-			console.log(branchDiv.value);
-			// window.location.href = "Branch_Orders.html";
+			var request;
+
+			if (window.XMLHttpRequest){
+				request = new XMLHttpRequest();
+			} else {
+				request = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+
+			request.open("POST", "BranchesMain.php", true);
+			request.setRequestHeader("Content-type", "application/json");
+			var req = {"branchName": branchDiv.value};
+			var jsonSend = JSON.stringify(req);
+			request.send(jsonSend);
+			window.location.href = "Branch_Orders.html";
 		}
+
 
 	</script>
 
