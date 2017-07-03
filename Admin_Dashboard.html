@@ -251,7 +251,6 @@
 							newDiv.type = "button";
 							newDiv.style.border = "none";
 							newDiv.id = "branchDiv" + (i+1);
-							//newDiv.onclick = queryBranch(this);
 							newDiv.setAttribute("onclick", "queryBranch(this)");
 							newDiv.className = "branchList";
 							newDiv.style.textAlign = "left";
@@ -271,9 +270,9 @@
 			}
 		}
 
-		function queryBranch(el){
+		function queryBranch(branchDiv){
 			console.log("Query Branch code here");
-			console.log(el.id);
+			console.log(branchDiv.value);
 			// window.location.href = "Branch_Orders.html";
 		}
 
