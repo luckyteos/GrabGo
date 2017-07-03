@@ -1,0 +1,121 @@
+<Doctype! html>
+<html lang = "en">
+	<head>
+		<meta charset = "UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title> Settings </title>
+		<link rel = "stylesheet" type = "text/css" href = "Styles/Admin.css">
+
+		<style>
+
+			::-webkit-input-placeholder {
+				color: white;
+			}
+
+			*{
+				margin:0;
+				padding:0;
+				box-sizing: border-box;
+			}
+
+			#headerText {
+				text-align: center;
+				color: white;
+				font-size: 1.9vmax;
+				position: relative;
+				top:8%;
+			}
+
+			#settingsDisplay {
+				width: 90%;
+			}
+
+			/*Media queries (currently for screen sizes 576, 768, 992 and 1200px)*/
+			/*@media only screen and (min-width: 576px){
+				#userDisplay, #searchContainer{
+					max-height: 8%;
+				}
+
+				#menuOptions{
+					height: 92%;
+				}
+			}
+
+			@media only screen and (min-width: 768px){
+				#userDisplay, #pageHeader{
+					max-height: 11%;
+				}
+
+				#menuOptions{
+					height: 89%;
+				}
+			}
+
+			@media only screen and (min-width: 992px){
+
+				#userDisplay,#pageHeader{
+					max-height: 13%;
+				}
+
+				#menuOptions{
+					height: 87%;
+				}
+
+			}*/
+
+			@media only screen and (min-width: 1200px){
+
+				#userDisplay, #pageHeader{
+					max-height: 17%;
+				}
+
+				#menuOptions{
+					height: 83%;
+				}
+
+			}
+
+		</style>
+	</head>
+
+	<body>
+	<div id = "primeDiv">
+		<div id = "sideDiv">
+			<div id = "userDisplay">
+				<img src = "Pictures/burger-logo2.png" style = "max-width: 30%; height: auto; position: relative; display: block; margin: auto"/>
+				<p id = "userLogin"> Welcome, Admin </p>
+			</div>
+			<div id = "menuOptions">
+				<ul id = "optionsList">
+					<li class = "optionsListStyle" id = "userLG">
+					<a href= "#" onclick = "openMenu()" id= "adminLogon">Welcome, Admin</a>
+					<div id = "admin-dropdown">
+						<a href = "Files_for_login/loginWithPHP/login.html">Logout</a>
+					</div>
+					</li>
+					<li class = "optionsListStyle"><a href = "Branch_Orders.html" class = "optionItem">Dashboard</a></li>
+					<li class = "optionsListStyle"><a href = "Settings.html" class = "optionItem">Settings</a></li>
+					<li class = "optionsListStyle" id = "logout"><a href = "Files_for_login/loginWithPHP/login.html" class = "optionItem">Log Out</a></li>
+				<ul>
+			</div>
+		</div>
+
+		<div id = "mainDiv">
+			<p id = "headerText"> Branch Systems Login </p>
+			<div id = "settingsDisplay">
+
+			</div>
+		</div>
+	</div>
+
+	<script>
+
+		function openMenu (){
+			document.getElementById("admin-dropdown").style.display = "block";
+		}
+
+	</script>
+
+	</body>
+
+</html>

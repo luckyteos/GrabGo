@@ -1,0 +1,284 @@
+<Doctype! html>
+<html lang = "en">
+	<head>
+		<meta charset = "UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title> Admin Dashboard </title>
+		<link rel = "stylesheet" type = "text/css" href = "Styles/Admin.css">
+		<!--<script
+  		src="https://code.jquery.com/jquery-3.2.1.js"
+  		integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+  		crossorigin="anonymous">
+		</script>-->
+		<style>
+
+			::-webkit-input-placeholder {
+				color: white;
+			}
+
+			*{
+				margin:0;
+				padding:0;
+				box-sizing: border-box;
+			}
+
+			#searchBar{
+				background-color: #707070;
+				width: 50%;
+				height: 7%;
+				position: relative;
+				top: 5%;
+				left: 25%;
+			}
+
+			#ordersDisplay{
+				clear: both;
+				position: relative;
+				top: 10%;
+				height: 83%;
+				width: 100%;
+			}
+
+			#searchField{
+				font-size: 1.6vmax;
+				border:none;
+				background-color: #707070;
+				position: relative;
+				left: 1%;
+				height: 100%;
+				width: 90%;
+				float: left;
+			}
+
+			#searchField:focus{
+				outline: none;
+			}
+
+			#searchIcon{
+				height: auto;
+				width: 100%;
+				max-width: 4%;
+				float: right;
+				position: relative;
+				right: 2%;
+				top: 22%;
+			}
+
+			.branchList {
+				display: block;
+				width: 90%;
+				height: auto;
+				background-color: #595959;
+				margin-bottom: 1%;
+				position: relative;
+				left: 5%;
+				padding: 1%;
+				color: white;
+				font-size: 1.4vmax;
+			}
+
+			.branchList:hover {
+				background-color: #808080;
+				cursor: hand;
+			}
+
+			@media only screen and (max-width: 1199px){
+				#userLG {
+					display: block;
+					text-align: inherit;
+				}
+			}
+
+			/*@media only screen and (min-width: 576px){
+				#userDisplay{
+					max-height: 8%;
+				}
+
+				#menuOptions{
+					height: 92%;
+				}
+			}
+
+			@media only screen and (min-width: 768px){
+				#userDisplay{
+					max-height: 11%;
+				}
+
+				#menuOptions{
+					height: 89%;
+				}
+			}
+
+			@media only screen and (min-width: 992px){
+
+				#userDisplay{
+					max-height: 13%;
+				}
+
+				#menuOptions{
+					height: 87%;
+				}
+
+			}*/
+
+			@media only screen and (min-width: 1200px){
+
+				#userDisplay{
+					max-height: 17%;
+				}
+
+				#menuOptions{
+					height: 83%;
+				}
+
+			}
+
+		</style>
+	</head>
+
+	<body>
+	<div id = "primeDiv">
+		<div id = "sideDiv">
+			<div id = "userDisplay">
+				<img src = "Pictures/burger-logo2.png" style = "max-width: 30%; height: auto; position: relative; display: block; margin: auto"/>
+				<p id = "userLogin"> Welcome, Admin </p>
+			</div>
+			<div id = "menuOptions">
+				<ul id = "optionsList">
+					<li class = "optionsListStyle" id = "userLG">
+					<a href= "#" onclick = "openMenu()" id= "adminLogon">Welcome, Admin</a>
+					<div id = "admin-dropdown">
+						<a href = "Files_for_login/loginWithPHP/login.html">Logout</a>
+					</div>
+					</li>
+					<li class = "optionsListStyle"><a href = "#" class = "optionItem">Dashboard</a></li>
+					<li class = "optionsListStyle"><a href = "Settings.html" class = "optionItem">Settings</a></li>
+					<li class = "optionsListStyle" id = "logout"><a href = "Files_for_login/loginWithPHP/login.html" class = "optionItem">Log Out</a></li>
+				<ul>
+			</div>
+		</div>
+
+		<div id = "mainDiv">
+			<div id = "searchBar">
+				<fieldset id = "searchArea" style = "border: none; height: 100%; width: 100%">
+					<input type = "text" name = "searchQuery" id = "searchField" placeholder = "Search for a Branch... " style = "color: white" onkeyup = "searchRequest()"/>
+					<!--<input type = "image" src = "Pictures/search-icon-png-9966.png" id = "searchIcon"/>-->
+				</fieldset>
+			</div>
+
+			<div id = "ordersDisplay">
+
+			</div>
+		</div>
+	</div>
+
+	<script>
+
+		function branchDisplay() {
+			var request;
+
+			if (window.XMLHttpRequest){
+				request = new XMLHttpRequest();
+			} else {
+				request = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+
+			request.onreadystatechange = function (){
+				if (this.readyState == 4 && this.status == 200){
+					var orderSection = document.getElementById("ordersDisplay");
+					var response = JSON.parse(this.responseText);
+					console.log(response);
+					for (var i = 0; i < response.length; i++){
+						var newDiv = document.createElement('input');
+						newDiv.type = "button";
+						newDiv.style.border = "none";
+						newDiv.onclick = function(){queryBranch()};
+						newDiv.className = "branchList";
+						newDiv.style.textAlign = "left";
+						newDiv.value = response[i].BranchAdd;
+						orderSection.appendChild(newDiv);
+					}
+
+				}
+			}
+
+			request.open("GET", "DashboardMain.php", true);
+			request.send();
+		}
+
+		branchDisplay();
+
+		function openMenu (){
+			document.getElementById("admin-dropdown").style.display = "block";
+		}
+
+		function searchRequest(){
+
+			var request;
+			var searchBox = document.getElementById("searchField");
+			var orderSection = document.getElementById("ordersDisplay");
+
+			if (searchField.value == ""){
+				console.log("Nothing in search");
+				while (orderSection.firstChild){
+					orderSection.removeChild(orderSection.firstChild);
+				}
+				branchDisplay();
+				return;
+			} else {
+				if (window.XMLHttpRequest){
+					request = new XMLHttpRequest();
+				} else {
+					request = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+
+				request.onreadystatechange = function () {
+
+					if (this.readyState == 4 && this.status == 200){
+						while (orderSection.firstChild){
+							orderSection.removeChild(orderSection.firstChild);
+						}
+						try {
+							var response = JSON.parse(this.responseText);
+						} catch (err){
+							console.log(err);
+							console.log(this.responseText);
+							return;
+						}
+						console.log(response);
+						for (var i = 0; i < response.length; i++){
+							var newDiv = document.createElement('input');
+							newDiv.type = "button";
+							newDiv.style.border = "none";
+							newDiv.id = "branchDiv" + (i+1);
+							//newDiv.onclick = queryBranch(this);
+							newDiv.setAttribute("onclick", "queryBranch(this)");
+							newDiv.className = "branchList";
+							newDiv.style.textAlign = "left";
+							newDiv.value = response[i].BranchAdd;
+							orderSection.appendChild(newDiv);
+						}
+					}
+
+				}
+
+				request.open("POST","DashboardMain.php",true);
+				request.setRequestHeader("Content-type", "application/json");
+				var req = {"query":searchBox.value, "function":"search"};
+				var jsonRequest = JSON.stringify(req);
+				request.send(jsonRequest);
+
+			}
+		}
+
+		function queryBranch(el){
+			console.log("Query Branch code here");
+			console.log(el.id);
+			// window.location.href = "Branch_Orders.html";
+		}
+
+	</script>
+
+	</body>
+
+</html>

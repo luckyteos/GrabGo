@@ -1,0 +1,175 @@
+<Doctype! html>
+<html lang = "en">
+	<head>
+		<meta charset = "UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title> Branch Orders </title>
+		<link rel = "stylesheet" type = "text/css" href = "Styles/Admin.css">
+
+		<style>
+
+			::-webkit-input-placeholder {
+				color: white;
+			}
+
+			*{
+				margin:0;
+				padding:0;
+				box-sizing: border-box;
+			}
+
+			/*Search*/
+			#searchContainer{
+				background-color: #707070;
+				height: 17%;
+				width: 100%;
+			}
+
+			#outlet {
+				text-align: center;
+				color: white;
+				font-size: 1.9vmax;
+				position: relative;
+				top:10%;
+			}
+
+			#searchBar{
+				background-color: #3f3f3f;
+				width: 50%;
+				height: 40%;
+				top: 20%;
+				position: relative;
+				left: 25%;
+			}
+
+			#searchField{
+				font-size: 1.6vmax;
+				border:none;
+				background-color: #3f3f3f;
+				position: relative;
+				left: 1%;
+				height: 100%;
+				width:90%;
+				float: left;
+			}
+
+			#searchField:focus{
+				outline: none;
+			}
+
+			#searchIcon{
+				height: auto;
+				width: 100%;
+				max-width: 4%;
+				float: right;
+				position: relative;
+				right: 2%;
+				top: 22%;
+			}
+
+			/*Order display Area*/
+			#ordersDisplay{
+				clear: both;
+				position: relative;
+				height: 83%;
+				width: 100%;
+			}
+
+			/*Media queries (currently for screen sizes 576, 768, 992 and 1200px)*/
+			/*@media only screen and (min-width: 576px){
+				#userDisplay, #searchContainer{
+					max-height: 8%;
+				}
+
+				#menuOptions{
+					height: 92%;
+				}
+			}
+
+			@media only screen and (min-width: 768px){
+				#userDisplay, #searchContainer{
+					max-height: 11%;
+				}
+
+				#menuOptions{
+					height: 89%;
+				}
+			}
+
+			@media only screen and (min-width: 992px){
+
+				#userDisplay,#searchContainer{
+					max-height: 13%;
+				}
+
+				#menuOptions{
+					height: 87%;
+				}
+
+			}*/
+
+			@media only screen and (min-width: 1200px){
+
+				#userDisplay, #searchContainer{
+					max-height: 17%;
+				}
+
+				#menuOptions{
+					height: 83%;
+				}
+
+			}
+
+		</style>
+	</head>
+
+	<body>
+	<div id = "primeDiv">
+		<div id = "sideDiv">
+			<div id = "userDisplay">
+				<img src = "Pictures/burger-logo2.png" style = "max-width: 30%; height: auto; position: relative; display: block; margin: auto"/>
+				<p id = "userLogin"> Welcome, Admin </p>
+			</div>
+			<div id = "menuOptions">
+				<ul id = "optionsList">
+					<li class = "optionsListStyle" id = "userLG">
+					<a href= "#" onclick = "openMenu()" id= "adminLogon">Welcome, Admin</a>
+					<div id = "admin-dropdown">
+						<a href = "Files_for_login/loginWithPHP/login.html">Logout</a>
+					</div>
+					</li>
+					<li class = "optionsListStyle"><a href = "Admin_Dashboard.html" class = "optionItem">Dashboard</a></li>
+					<li class = "optionsListStyle"><a href = "Settings.html" class = "optionItem">Settings</a></li>
+					<li class = "optionsListStyle" id = "logout"><a href = "Files_for_login/loginWithPHP/login.html" class = "optionItem">Log Out</a></li>
+				<ul>
+			</div>
+		</div>
+
+		<div id = "mainDiv">
+			<div id = "searchContainer">
+				<p id = "outlet"> Kallang Wave Mall #01-12 </p>
+				<div id = "searchBar">
+					<form style = "height:100%; width: 100%">
+						<input type = "text" id = "searchField" placeholder = "Search for a Branch... " style = "color: white"/>
+						<input type = "image" src = "Pictures/search-icon-png-9966.png" id = "searchIcon"/>
+					</form>
+				</div>
+			</div>
+
+			<div id = "ordersDisplay">
+
+			</div>
+		</div>
+	</div>
+
+	<script>
+
+		function openMenu (){
+			document.getElementById("admin-dropdown").style.display = "block";
+		}
+
+	</script>
+
+	</body>
+
+</html>
