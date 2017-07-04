@@ -163,9 +163,48 @@
 	</div>
 
 	<script>
-
+		setBranchName();
+		initOrders();
 		function openMenu (){
 			document.getElementById("admin-dropdown").style.display = "block";
+		}
+
+		function setBranchName() {
+			var request;
+			if (window.XMLHttpRequest){
+				request = new XMLHttpRequest();
+			} else {
+				request = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+
+			request.onload = function(){
+					var outletName = document.getElementById("outlet");
+					outletName.textContent = this.responseText;
+			}
+
+			request.open("POST", "BranchesMain.php", true);
+			request.setRequestHeader("Content-type", "application/json");
+			var req = {"function":"setBranchName"};
+			request.send(JSON.stringify(req));
+		}
+
+		function initOrders(){
+			var request;
+			if(window.XMLHttpRequest){
+				request = new XMLHttpRequest;
+			} else {
+				request = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+
+			request.onload = function () {
+				var responseJson = JSON.parse(this.responseText);
+				var displayArea = document.getElementById("ordersDisplay");
+				displayArea.innerHTML = this.responseText;
+			}
+
+			request.open("GET", "BranchesMain.php", true);
+			request.send();
+
 		}
 
 	</script>

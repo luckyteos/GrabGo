@@ -282,10 +282,13 @@
 
 			request.open("POST", "BranchesMain.php", true);
 			request.setRequestHeader("Content-type", "application/json");
-			var req = {"branchName": branchDiv.value};
+			var req = {"branchName": branchDiv.value, "function": "sendInfo"};
 			var jsonSend = JSON.stringify(req);
 			request.send(jsonSend);
-			window.location.href = "Branch_Orders.html";
+			request.onload = function() {
+				window.location.href = this.responseText;
+			}
+			//window.location.href = "Branch_Orders.html";
 		}
 
 
