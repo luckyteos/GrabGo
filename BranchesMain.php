@@ -20,31 +20,65 @@
         echo $branchName;
       }
 
+      function getOrderDetails($post){
+        $servername = "localhost";
+        $username = "root";
+        $password = "";
+
+        $myQuery = "SELECT fp.prodname AS name, o.numofprod AS quantity, fp.prodprice AS price, o.paymentType AS payment_method,
+                    fp.prodprice*o.numofprod AS totalPrice
+                    FROM appleseedfoodpro.foodpro fp
+                    INNER JOIN appleseedorder.orders o on fp.prodno = o.prodnum
+                    WHERE o.order_id = ".$post['orderNum'];
+
+        $conn = new mysqli($servername, $username, $password);
+        $result = $conn->query($myQuery);
+        $temp = array();
+
+        if ($result->num_rows > 0){
+          while ($row = $result->fetch_assoc()){
+            array_push($temp, $row);
+          }
+          echo json_encode($temp);
+        } else {
+          echo "Nothing's Here";
+        }
+
+
+      }
+
       if ($postData['function'] == "sendInfo"){
         sendInfo();
       } else if ($postData['function'] == "setBranchName") {
         setBranchName();
+      } else if ($postData['function'] == "getOrderDetails"){
+        getOrderDetails($postData);
       }
 
   }
 
   if ($_SERVER["REQUEST_METHOD"] == "GET"){
-    $postData = $_SESSION["branchName"];
 
     $servername = "localhost";
     $username = "root";
     $password = "";
 
-    $queryString = "SELECT o.order_id, c.LName AS custName, DATE_FORMAT(o.TimeDate,\"%d-%m-%Y\")
-    AS orderDate, DATE_FORMAT(o.TimeDate, \"%H:%i:%s\") AS orderTime,
-    o.OrderType, fp.ProdName, o.numofprod, o.paymentType, o.numofprod*fp.prodprice AS totalPayment
-    FROM appleseedorder.orders o
-    INNER JOIN appleseeduser.customer c on c.customer_id = o.customer_id
-    INNER JOIN appleseedfoodpro.foodpro fp on fp.prodno = o.prodnum
-    INNER JOIN appleseedcompany.branch b on b.branch_id = o.branch_id
-    WHERE o.branch_id = 3";
+    $branchData = $_SESSION["postData"];
+    $branchName = $branchData['branchName'];
+    $branchQuery = "SELECT branch_id FROM appleseedcompany.branch WHERE branchadd = '".$branchName ."'";
 
     $conn = new mysqli($servername, $username, $password);
+    $branchQueryResult = $conn->query($branchQuery);
+    $rowReturned = $branchQueryResult->fetch_assoc();
+
+    $queryString = "SELECT o.order_id, c.LName AS custName, DATE_FORMAT(o.TimeDate,\"%d-%m-%Y\")
+    AS orderDate, DATE_FORMAT(o.TimeDate, \"%H:%i:%s\") AS orderTime,
+    o.OrderType
+    FROM appleseedorder.orders o
+    INNER JOIN appleseeduser.customer c on c.customer_id = o.customer_id
+    INNER JOIN appleseedcompany.branch b on b.branch_id = o.branch_id
+    WHERE o.branch_id = ".$rowReturned['branch_id'] ." AND o.status = 'Completed'";
+
     $queryResult = $conn->query($queryString);
     $tempArray = array();
 
@@ -54,7 +88,8 @@
       }
       echo json_encode($tempArray);
     } else {
-      echo "Nothing's Here";
+      $tempArray = array("Error"=>"No Current Orders");
+      echo json_encode($tempArray);
     }
 
   }

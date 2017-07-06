@@ -75,6 +75,49 @@
 				width: 100%;
 			}
 
+			.ordersTableData {
+				padding: 1%;
+				color: white;
+				font-size: 1.4vmax;
+				margin-top: 1.1%;
+				text-align: center;
+			}
+
+			.orderDetailData {
+				padding: 1%;
+				color: white;
+				font-size: 1.2vmax;
+				margin-top: 1.1%;
+				width: 5px;
+			}
+
+			.ordersDiv {
+				width: 80%;
+				background-color: #595959;
+				position: relative;
+				left: 10%;
+				margin-top: 1.2%;
+			}
+
+			.openBtnStyle {
+				border: none;
+				background-color: #595959;
+				font-size: 1.4vmax;
+				padding: 1%;
+				color: white;
+				display: inline-block;
+				text-decoration: none;
+			}
+
+			.openBtnStyle:hover {
+				color: #787878;
+				cursor: hand;
+			}
+
+			.openBtnStyle:focus {
+				outline: 0;
+			}
+
 			/*Media queries (currently for screen sizes 576, 768, 992 and 1200px)*/
 			/*@media only screen and (min-width: 576px){
 				#userDisplay, #searchContainer{
@@ -147,10 +190,10 @@
 
 		<div id = "mainDiv">
 			<div id = "searchContainer">
-				<p id = "outlet"> Kallang Wave Mall #01-12 </p>
+				<p id = "outlet"></p>
 				<div id = "searchBar">
 					<form style = "height:100%; width: 100%">
-						<input type = "text" id = "searchField" placeholder = "Search for a Branch... " style = "color: white"/>
+						<input type = "text" id = "searchField" placeholder = "Search for a Order... " style = "color: white"/>
 						<input type = "image" src = "Pictures/search-icon-png-9966.png" id = "searchIcon"/>
 					</form>
 				</div>
@@ -199,12 +242,131 @@
 			request.onload = function () {
 				var responseJson = JSON.parse(this.responseText);
 				var displayArea = document.getElementById("ordersDisplay");
-				displayArea.innerHTML = this.responseText;
+
+				if ("Error" in responseJson){
+					displayArea.textContent = responseJson.Error;
+					displayArea.style.textAlign = "center";
+					displayArea.style.fontSize = "1.5vmax";
+					displayArea.style.color = "white";
+				} else {
+
+					for (var i = 0; i < responseJson.length; i++){
+						var newDiv = document.createElement("div");
+						var table = document.createElement("table");
+						var row = document.createElement("tr");
+
+						var currentArray = responseJson[i];
+
+						displayArea.appendChild(newDiv);
+						newDiv.appendChild(table);
+						table.appendChild(row);
+
+						newDiv.className = "ordersDiv";
+						table.style.width = "100%";
+
+						for (var r in currentArray){
+							var data = document.createElement("td");
+							data.textContent = currentArray[r];
+							data.className = "ordersTableData";
+							row.appendChild(data);
+						}
+
+						var openBtn = document.createElement('input');
+						openBtn.setAttribute('type', 'button');
+						openBtn.setAttribute('onclick', 'displayOrderInfo(this.parentNode.parentNode, this.parentNode.parentNode.parentNode.parentNode, this)')
+						openBtn.value = "Open";
+						openBtn.className = "openBtnStyle";
+						var data = document.createElement("td");
+						data.className = "ordersTableData";
+						data.appendChild(openBtn);
+						row.appendChild(data);
+
+					}
+
+				}
+
 			}
 
 			request.open("GET", "BranchesMain.php", true);
 			request.send();
 
+		}
+
+		function displayOrderInfo(ordersTable, ordersDiv, button) {
+			console.log(ordersTable.childNodes[0].textContent);
+			console.log(ordersDiv);
+			//orderNum = order_id in appleseedorder.orders
+			var orderNum = ordersTable.childNodes[0].textContent;
+			button.value = "Close";
+			button.setAttribute("onclick", "closeOrderInfoDiv(this.parentNode.parentNode.parentNode.parentNode, this)");
+
+			var request;
+			if (window.XMLHttpRequest){
+				request = new XMLHttpRequest();
+			} else {
+				request = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+
+			request.onload = function (){
+				var jsonResponse = JSON.parse(this.responseText);
+				console.log(jsonResponse);
+
+				var newDiv = document.createElement('div');
+				var table = document.createElement('table');
+
+				ordersDiv.appendChild(newDiv);
+				table.style.width = "100%";
+				table.style.borderCollapse = "collapse";
+				table.style.tableLayout = "fixed";
+				newDiv.appendChild(table);
+
+				for (var i = 0; i < jsonResponse.length; i++){
+					var row = document.createElement('tr');
+					var data = document.createElement('td');
+					var data1 = document.createElement('td');
+					data.className = "orderDetailData";
+					data1.className = "orderDetailData";
+					data.textContent = jsonResponse[i].name;
+					data1.textContent = jsonResponse[i].quantity + " x $" +jsonResponse[i].price;
+					data1.style.textAlign = "right";
+					row.appendChild(data);
+					row.appendChild(data1);
+					table.appendChild(row);
+				}
+
+				for (var x = 0; x < jsonResponse.length; x++){
+					var row1 = document.createElement('tr');
+					var data2 = document.createElement('td');
+					var data3 = document.createElement('td');
+
+					data2.textContent = "Payment By: " +jsonResponse[x].payment_method;
+					data3.textContent = "$" +jsonResponse[x].totalPrice;
+					data2.className = "orderDetailData";
+					data3.className = "orderDetailData";
+					data3.style.textAlign = "right";
+
+					row1.appendChild(data2);
+					row1.appendChild(data3);
+					row1.style.borderTop = "2px solid white";
+					table.appendChild(row1);
+				}
+
+
+
+			}
+
+			request.open("POST", "BranchesMain.php", true);
+			request.setRequestHeader("Content-type", "application/json");
+			var jsonRequest = {"orderNum": orderNum, "function": "getOrderDetails"};
+			request.send(JSON.stringify(jsonRequest));
+
+		}
+
+		function closeOrderInfoDiv(ordersDiv, button){
+			var orderInfoDiv = ordersDiv.lastChild;
+			button.value = "Open";
+			button.setAttribute("onclick", "displayOrderInfo(this.parentNode.parentNode, this.parentNode.parentNode.parentNode.parentNode, this)");
+			ordersDiv.removeChild(orderInfoDiv);
 		}
 
 	</script>
