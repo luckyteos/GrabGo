@@ -47,12 +47,80 @@
 
       }
 
+      function search($post){
+        $servername = "localhost";
+        $username = "root";
+        $password = "";
+
+        $conn = new mysqli($servername, $username, $password);
+        $branchData = $_SESSION["postData"];
+        $branchName = $branchData['branchName'];
+        $branchQuery = "SELECT branch_id FROM appleseedcompany.branch WHERE branchadd = '".$branchName ."'";
+
+        $branchQueryResult = $conn->query($branchQuery);
+        $rowReturned = $branchQueryResult->fetch_assoc();
+        $searchCategory = '';
+        $addSQL = '';
+        $newSearchQuery = $post['searchQuery'];
+
+        if (isset($post['searchBy'])){
+
+          switch ($post['searchBy']){
+            case "Order Id": $searchCategory = "o.order_id";
+                             break;
+            case "Order Date": $newSearchQuery = "o.TimeDate = '" .$newSearchQuery ."'";
+                               break;
+            case "Order Type": $searchCategory = "o.OrderType";
+                               $newSearchQuery = " = '".$newSearchQuery."'";
+                               break;
+            case "Customer Name": $searchCategory = "c.LName";
+                                  $newSearchQuery = " Like '%".$newSearchQuery."%'";
+                                  break;
+            case "Product Name":  $addSQL = "INNER JOIN appleseedfoodpro.foodpro fp on fp.prodno = o.prodnum";
+                                  $searchCategory = "fp.prodname";
+                                  $newSearchQuery = " Like '".$newSearchQuery."%'";
+                                  break;
+            case "Payment Type": $searchCategory = "o.PaymentType";
+                                 $newSearchQuery = " = '".$newSearchQuery."'";
+                                 break;
+          }
+        }
+
+        var_dump($addSQL);
+        var_dump($searchCategory);
+
+
+        $myQuery = "SELECT o.order_id, c.LName AS custName, DATE_FORMAT(o.TimeDate,\"%Y-%m-%d\")
+        AS orderDate, DATE_FORMAT(o.TimeDate, \"%H:%i:%s\") AS orderTime, o.OrderType
+        FROM appleseedorder.orders o
+        INNER JOIN appleseeduser.customer c on c.customer_id = o.customer_id
+        INNER JOIN appleseedcompany.branch b on b.branch_id = o.branch_id " .$addSQL ." WHERE o.branch_id = ".$rowReturned['branch_id']
+        ." AND " .$searchCategory .$newSearchQuery;
+        echo $myQuery;
+
+        $result = $conn->query($myQuery);
+        $tempArray = array();
+
+        if ($result->num_rows > 0){
+          while ($row = $result->fetch_assoc()){
+            array_push($tempArray, $row);
+          }
+          echo json_encode($tempArray);
+        } else {
+          $tempArray = array("Error"=>"Order Not Found");
+          echo json_encode($tempArray);
+        }
+
+      }
+
       if ($postData['function'] == "sendInfo"){
         sendInfo();
       } else if ($postData['function'] == "setBranchName") {
         setBranchName();
       } else if ($postData['function'] == "getOrderDetails"){
         getOrderDetails($postData);
+      } else if ($postData['function'] == "search"){
+        search($postData);
       }
 
   }
@@ -71,7 +139,7 @@
     $branchQueryResult = $conn->query($branchQuery);
     $rowReturned = $branchQueryResult->fetch_assoc();
 
-    $queryString = "SELECT o.order_id, c.LName AS custName, DATE_FORMAT(o.TimeDate,\"%d-%m-%Y\")
+    $queryString = "SELECT o.order_id, c.LName AS custName, DATE_FORMAT(o.TimeDate,\"%Y-%m-%d\")
     AS orderDate, DATE_FORMAT(o.TimeDate, \"%H:%i:%s\") AS orderTime,
     o.OrderType
     FROM appleseedorder.orders o

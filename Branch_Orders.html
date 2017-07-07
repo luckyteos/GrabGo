@@ -193,7 +193,7 @@
 				<p id = "outlet"></p>
 				<div id = "searchBar">
 					<form style = "height:100%; width: 100%">
-						<input type = "text" id = "searchField" placeholder = "Search for a Order... " style = "color: white"/>
+						<input type = "text" id = "searchField" placeholder = "Search for a Order... " style = "color: white" onkeyup = "searchRequest()"/>
 						<input type = "image" src = "Pictures/search-icon-png-9966.png" id = "searchIcon"/>
 					</form>
 				</div>
@@ -290,6 +290,29 @@
 			request.open("GET", "BranchesMain.php", true);
 			request.send();
 
+		}
+
+		function searchRequest(){
+			var request;
+			var searchBox = document.getElementById("searchField");
+			if (window.XMLHttpRequest){
+				request = new XMLHttpRequest();
+			} else {
+				request = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+
+			request.onload = function (){
+				var ordersDiv = document.createElement("ordersDisplay");
+				while (ordersDiv.firstChild){
+					ordersDiv.removeChild(ordersDiv.firstChild);
+				}
+				console.log(this.responseText);
+			}
+
+			request.open("POST", "BranchesMain.php", true);
+			request.setRequestHeader("Content-type", "application/json");
+			var jsonRequest = {"searchQuery": searchBox.value, "function":"search", "searchBy": "Order Date"};
+			request.send(JSON.stringify(jsonRequest));
 		}
 
 		function displayOrderInfo(ordersTable, ordersDiv, button) {
