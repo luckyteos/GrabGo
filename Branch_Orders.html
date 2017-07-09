@@ -20,36 +20,34 @@
 
 			/*Search*/
 			#searchContainer{
-				background-color: #707070;
-				height: 17%;
 				width: 100%;
+				height: auto;
 			}
 
 			#outlet {
 				text-align: center;
 				color: white;
 				font-size: 1.9vmax;
-				position: relative;
-				top:10%;
+				margin-top: 1%;
 			}
 
 			#searchBar{
 				background-color: #3f3f3f;
-				width: 50%;
-				height: 40%;
-				top: 20%;
+				width: 40%;
+				margin: 1.5% 0 0 22.5%;
 				position: relative;
-				left: 25%;
+				padding: 1%;
+				float: left;
 			}
 
 			#searchField{
+				display: inline-block;
 				font-size: 1.6vmax;
 				border:none;
 				background-color: #3f3f3f;
 				position: relative;
 				left: 1%;
-				height: 100%;
-				width:90%;
+				width: 100%;
 				float: left;
 			}
 
@@ -59,12 +57,12 @@
 
 			#searchIcon{
 				height: auto;
-				width: 100%;
 				max-width: 4%;
-				float: right;
 				position: relative;
 				right: 2%;
-				top: 22%;
+				top: 23%;
+				float: right;
+				display: block;
 			}
 
 			/*Order display Area*/
@@ -116,6 +114,43 @@
 
 			.openBtnStyle:focus {
 				outline: 0;
+			}
+
+			#filterDiv {
+				display: block;
+				float: left;
+				padding: 1%;
+				margin: 1.6% 0 0 1%;
+				background-color: #3f3f3f;
+			}
+
+			#filterBy {
+				display: block;
+				width: 100%;
+				text-decoration: none;
+				font-size: 1.3vmax;
+				color: white;
+			}
+
+			#ordersFilter {
+				position: absolute;
+				display: block;
+				z-index: 1;
+				display: none;
+				min-width: 10px;
+			}
+
+			.filterType {
+				display: block;
+				background-color: #3f3f3f;
+				border: none;
+				color: white;
+				padding: 4px 6px;
+				font-size: 1.2vmax;
+			}
+
+			#filterBy:hover {
+				background-color: #595959;
 			}
 
 			/*Media queries (currently for screen sizes 576, 768, 992 and 1200px)*/
@@ -191,12 +226,22 @@
 		<div id = "mainDiv">
 			<div id = "searchContainer">
 				<p id = "outlet"></p>
+				<fieldset style = "height: auto; width: 100%; border: none;">
 				<div id = "searchBar">
-					<form style = "height:100%; width: 100%">
 						<input type = "text" id = "searchField" placeholder = "Search for a Order... " style = "color: white" onkeyup = "searchRequest()"/>
-						<input type = "image" src = "Pictures/search-icon-png-9966.png" id = "searchIcon"/>
-					</form>
 				</div>
+				<div id = "filterDiv">
+					<a href = "#" id = "filterBy" onmouseover = "openOrderFilter()"> Filter By: </a>
+					<div id = "ordersFilter">
+						<input type = "button" class = "filterType" value = "Order Id" onclick = "setFilterType(this)"/>
+						<input type = "button" class = "filterType" value = "Order Date" onclick = "setFilterType(this)"/>
+						<input type = "button" class = "filterType" value = "Order Type" onclick = "setFilterType(this)"/>
+						<input type = "button" class = "filterType" value = "Customer Name" onclick = "setFilterType(this)"/>
+						<input type = "button" class = "filterType" value = "Product Name" onclick = "setFilterType(this)"/>
+						<input type = "button" class = "filterType" value = "Payment Type" onclick = "setFilterType(this)"/>
+					</div>
+				</div>
+			</fieldset>
 			</div>
 
 			<div id = "ordersDisplay">
@@ -295,6 +340,17 @@
 		function searchRequest(){
 			var request;
 			var searchBox = document.getElementById("searchField");
+			var displayArea = document.getElementById("ordersDisplay");
+			var filterBy = document.getElementById("filterBy");
+
+			if (searchBox.value == ""){
+				while (displayArea.firstChild){
+					displayArea.removeChild(displayArea.firstChild);
+				}
+				initOrders();
+				return;
+			}
+
 			if (window.XMLHttpRequest){
 				request = new XMLHttpRequest();
 			} else {
@@ -302,17 +358,60 @@
 			}
 
 			request.onload = function (){
-				var ordersDiv = document.createElement("ordersDisplay");
-				while (ordersDiv.firstChild){
-					ordersDiv.removeChild(ordersDiv.firstChild);
+				while (displayArea.firstChild){
+					displayArea.removeChild(displayArea.firstChild);
 				}
-				console.log(this.responseText);
+				var responseJson = JSON.parse(this.responseText);
+				if ("Error" in responseJson){
+					displayArea.textContent = responseJson.Error;
+					displayArea.style.textAlign = "center";
+					displayArea.style.fontSize = "1.5vmax";
+					displayArea.style.color = "white";
+				} else {
+
+					for (var i = 0; i < responseJson.length; i++){
+						var newDiv = document.createElement("div");
+						var table = document.createElement("table");
+						var row = document.createElement("tr");
+
+						var currentArray = responseJson[i];
+
+						displayArea.appendChild(newDiv);
+						newDiv.appendChild(table);
+						table.appendChild(row);
+
+						newDiv.className = "ordersDiv";
+						table.style.width = "100%";
+
+						for (var r in currentArray){
+							var data = document.createElement("td");
+							data.textContent = currentArray[r];
+							data.className = "ordersTableData";
+							row.appendChild(data);
+						}
+
+						var openBtn = document.createElement('input');
+						openBtn.setAttribute('type', 'button');
+						openBtn.setAttribute('onclick', 'displayOrderInfo(this.parentNode.parentNode, this.parentNode.parentNode.parentNode.parentNode, this)')
+						openBtn.value = "Open";
+						openBtn.className = "openBtnStyle";
+						var data = document.createElement("td");
+						data.className = "ordersTableData";
+						data.appendChild(openBtn);
+						row.appendChild(data);
+
+					}
+
+				}
 			}
 
-			request.open("POST", "BranchesMain.php", true);
-			request.setRequestHeader("Content-type", "application/json");
-			var jsonRequest = {"searchQuery": searchBox.value, "function":"search", "searchBy": "Order Date"};
-			request.send(JSON.stringify(jsonRequest));
+				var result = filterBy.textContent.split(":");
+				var filterByType = result[1].trim();
+				var jsonRequest = {"searchQuery": searchBox.value, "function":"search", "searchBy": filterByType};
+				request.open("POST", "BranchesMain.php", true);
+				request.setRequestHeader("Content-type", "application/json");
+				request.send(JSON.stringify(jsonRequest));
+
 		}
 
 		function displayOrderInfo(ordersTable, ordersDiv, button) {
@@ -390,6 +489,23 @@
 			button.value = "Open";
 			button.setAttribute("onclick", "displayOrderInfo(this.parentNode.parentNode, this.parentNode.parentNode.parentNode.parentNode, this)");
 			ordersDiv.removeChild(orderInfoDiv);
+		}
+
+		function openOrderFilter (){
+			var filterOptions = document.getElementById("ordersFilter")
+			filterOptions.style.display = "block";
+		}
+
+		function closeOrderFilter (){
+			var filterOptions = document.getElementById("ordersFilter")
+			filterOptions.style.display = "none";
+		}
+
+		function setFilterType(selectedFilter){
+			var filterDisplay = document.getElementById("filterBy");
+			filterDisplay.textContent = "Filter By: ";
+			filterDisplay.textContent += selectedFilter.value;
+			closeOrderFilter();
 		}
 
 	</script>

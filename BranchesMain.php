@@ -66,7 +66,7 @@
         if (isset($post['searchBy'])){
 
           switch ($post['searchBy']){
-            case "Order Id": $searchCategory = "o.order_id";
+            case "Order Id": $searchCategory = "o.order_id = ";
                              break;
             case "Order Date": $newSearchQuery = "o.TimeDate = '" .$newSearchQuery ."'";
                                break;
@@ -86,9 +86,6 @@
           }
         }
 
-        var_dump($addSQL);
-        var_dump($searchCategory);
-
 
         $myQuery = "SELECT o.order_id, c.LName AS custName, DATE_FORMAT(o.TimeDate,\"%Y-%m-%d\")
         AS orderDate, DATE_FORMAT(o.TimeDate, \"%H:%i:%s\") AS orderTime, o.OrderType
@@ -96,7 +93,6 @@
         INNER JOIN appleseeduser.customer c on c.customer_id = o.customer_id
         INNER JOIN appleseedcompany.branch b on b.branch_id = o.branch_id " .$addSQL ." WHERE o.branch_id = ".$rowReturned['branch_id']
         ." AND " .$searchCategory .$newSearchQuery;
-        echo $myQuery;
 
         $result = $conn->query($myQuery);
         $tempArray = array();
