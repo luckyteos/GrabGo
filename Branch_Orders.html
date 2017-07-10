@@ -120,8 +120,12 @@
 				display: block;
 				float: left;
 				padding: 1%;
-				margin: 1.6% 0 0 1%;
+				margin: 1.7% 0 0 1%;
 				background-color: #3f3f3f;
+			}
+
+			#filterDiv:hover {
+				background-color: #595959;
 			}
 
 			#filterBy {
@@ -132,12 +136,15 @@
 				color: white;
 			}
 
+			#filterBy:hover {
+				background-color: #595959;
+			}
+
 			#ordersFilter {
 				position: absolute;
 				display: block;
 				z-index: 1;
 				display: none;
-				min-width: 10px;
 			}
 
 			.filterType {
@@ -146,12 +153,12 @@
 				border: none;
 				color: white;
 				padding: 4px 6px;
+				width: 100%;
+				text-align: center;
 				font-size: 1.2vmax;
 			}
 
-			#filterBy:hover {
-				background-color: #595959;
-			}
+
 
 			/*Media queries (currently for screen sizes 576, 768, 992 and 1200px)*/
 			/*@media only screen and (min-width: 576px){
@@ -361,7 +368,12 @@
 				while (displayArea.firstChild){
 					displayArea.removeChild(displayArea.firstChild);
 				}
-				var responseJson = JSON.parse(this.responseText);
+				try {
+					var responseJson = JSON.parse(this.responseText);
+				} catch (err){
+					displayArea.innerHTML = this.responseText;
+				}
+
 				if ("Error" in responseJson){
 					displayArea.textContent = responseJson.Error;
 					displayArea.style.textAlign = "center";
@@ -407,10 +419,19 @@
 
 				var result = filterBy.textContent.split(":");
 				var filterByType = result[1].trim();
-				var jsonRequest = {"searchQuery": searchBox.value, "function":"search", "searchBy": filterByType};
-				request.open("POST", "BranchesMain.php", true);
-				request.setRequestHeader("Content-type", "application/json");
-				request.send(JSON.stringify(jsonRequest));
+				if (filterByType){
+					var jsonRequest = {"searchQuery": searchBox.value, "function":"search", "searchBy": filterByType};
+					request.open("POST", "BranchesMain.php", true);
+					request.setRequestHeader("Content-type", "application/json");
+					request.send(JSON.stringify(jsonRequest));
+
+				} else {
+					displayArea.textContent = "Please select a filter type before searching";
+					displayArea.style.textAlign = "center";
+					displayArea.style.fontSize = "1.5vmax";
+					displayArea.style.color = "white";
+				}
+
 
 		}
 
@@ -456,13 +477,16 @@
 					table.appendChild(row);
 				}
 
-				for (var x = 0; x < jsonResponse.length; x++){
-					var row1 = document.createElement('tr');
-					var data2 = document.createElement('td');
-					var data3 = document.createElement('td');
+				var row1 = document.createElement('tr');
+				var data2 = document.createElement('td');
+				var data3 = document.createElement('td');
+				var totalPrice = 0;
 
-					data2.textContent = "Payment By: " +jsonResponse[x].payment_method;
-					data3.textContent = "$" +jsonResponse[x].totalPrice;
+				for (var x = 0; x < jsonResponse.length; x++){
+
+					totalPrice += parseFloat(jsonResponse[x].totalPrice);
+					data2.textContent = "Payment By: " +jsonResponse[0].payment_method;
+					data3.textContent = "$" +totalPrice.toFixed(2);
 					data2.className = "orderDetailData";
 					data3.className = "orderDetailData";
 					data3.style.textAlign = "right";

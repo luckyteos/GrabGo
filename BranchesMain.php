@@ -92,20 +92,27 @@
         FROM appleseedorder.orders o
         INNER JOIN appleseeduser.customer c on c.customer_id = o.customer_id
         INNER JOIN appleseedcompany.branch b on b.branch_id = o.branch_id " .$addSQL ." WHERE o.branch_id = ".$rowReturned['branch_id']
-        ." AND " .$searchCategory .$newSearchQuery;
+        ." AND " .$searchCategory .$newSearchQuery ." GROUP BY o.order_id, o.OrderType";
 
-        $result = $conn->query($myQuery);
         $tempArray = array();
 
-        if ($result->num_rows > 0){
-          while ($row = $result->fetch_assoc()){
-            array_push($tempArray, $row);
+        if ($conn->query($myQuery)){
+          $result = $conn->query($myQuery);
+          if ($result->num_rows > 0){
+            while ($row = $result->fetch_assoc()){
+              array_push($tempArray, $row);
+            }
+            echo json_encode($tempArray);
+          } else {
+            $tempArray = array("Error"=>"Order Not Found");
+            echo json_encode($tempArray);
           }
-          echo json_encode($tempArray);
         } else {
-          $tempArray = array("Error"=>"Order Not Found");
+          $tempArray = array("Error"=>"We could not find the item you are searching for :( Try something else?");
           echo json_encode($tempArray);
         }
+
+
 
       }
 
@@ -141,7 +148,8 @@
     FROM appleseedorder.orders o
     INNER JOIN appleseeduser.customer c on c.customer_id = o.customer_id
     INNER JOIN appleseedcompany.branch b on b.branch_id = o.branch_id
-    WHERE o.branch_id = ".$rowReturned['branch_id'] ." AND o.status = 'Completed'";
+    WHERE o.branch_id = ".$rowReturned['branch_id']
+    ." GROUP BY o.order_id, o.OrderType";
 
     $queryResult = $conn->query($queryString);
     $tempArray = array();
